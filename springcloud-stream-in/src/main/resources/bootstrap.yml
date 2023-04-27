@@ -1,0 +1,61 @@
+server:
+  port: 8702
+
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  application:
+    name: springcloud-stream-in
+
+  cloud:
+    nacos:
+      config:
+        remote-first: true
+        bootstrap:
+          enable: true
+        server-addr: 127.0.0.1:8848
+        namespace: dev
+        file-extension: yaml
+        extension-configs[0]:
+          data-id: mq-client.yaml
+          group: test
+          refresh: true
+
+    function:
+#      definition: upperCase;confirmAdjust
+
+    stream:
+      function:
+#     @See StreamFunctionProperties
+
+        definition: uppercase;confirmAdjust
+#        routing:
+#          enabled: true
+        bindings:
+          uppercase-in-0: uppercase.exchange
+
+#     @See BindingServiceProperties
+      default-binder: defaultRabbit
+      binders:
+        # rabbitmq默认配置，用于binding整合
+        defaultRabbit:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: 127.0.0.1
+                port: 5672
+                username: admin
+                password: admin
+                virtual-host: /scm
+
+logging:
+  level:
+    com:
+      lys: debug
+
+
+
+
+

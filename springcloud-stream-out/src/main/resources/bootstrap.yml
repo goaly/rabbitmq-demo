@@ -1,0 +1,91 @@
+server:
+  port: 8701
+spring:
+  application:
+    name: springcloud-stream-out
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      config:
+        remote-first: true
+        bootstrap:
+          enable: true
+        server-addr: 127.0.0.1:8848
+        namespace: dev
+        file-extension: yaml
+        extension-configs[0]:
+          data-id: mq-client.yaml
+          group: test
+          refresh: true
+    stream:
+      function:
+#        definition: funcMq;
+#        bindings:
+#          upperCase-in-0: uppercase.exchange
+
+      default-binder: defaultRabbit
+      binders:
+        # rabbitmq默认配置，用于binding整合
+        defaultRabbit:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                host: 127.0.0.1
+                port: 5672
+                username: admin
+                password: admin
+                virtual-host: /
+
+        #        adjust-bill-confirm-in:
+        #          binder: defaultRabbit
+        #          destination: scm.sp.adjustBill.operation.exchange
+        #          content-type: application/json
+        #          #在多实例的时候需要制定一个消息分组，不然每个实例都是匿名方式把队列注册到rabbitmq上去，导致一个交换机下有多个队列
+        #          #并且默认生成的交换机是topic类型的，会导致重复消费
+        #          #拥有group默认会持久化队列？
+        #          group: scm.adjustBill.queue
+
+        #        # 调帐单确认发布
+        #        adjust-bill-confirm-out:
+        #          binder: defaultRabbit
+        #          #若消息系统是RabbitMQ，目的地（destination）就是指exchange，消息系统是Kafka，那么就是指topic
+        #          destination: scm.sp.adjustBill.operation.exchange
+        #          content-type: application/json
+
+        # 函数式MQ发布
+  #        funcMq-out-0:
+  #          binder: defaultRabbit
+  #          #若消息系统是RabbitMQ，目的地（destination）就是指exchange，消息系统是Kafka，那么就是指topic
+  #          destination: funcMq-exchange
+  #          content-type: application/json
+
+  #      rabbit:
+  #        bindings:
+  #          funcMq-out-0:
+  #            producer:
+  #              routing-key-expression: '''funcMq.0'''
+  #              exchange-type: direct
+
+  #          adjust-bill-confirm-out:
+  #            # 生产者
+  #            producer:
+  #              routing-key-expression: '''confirm'''
+  #              exchange-type: direct
+
+  #
+  #          adjust-bill-confirm-in:
+  #            # 消费者
+  #            consumer:
+  #              binding-routing-key: confirm
+  #              # 只使用group的名字作为队列的名字，否则队列名是destination.group。当使用已经有的队列消费时，这个属性会有用
+  #              queueNameGroupOnly: true
+  #              exchange-type: direct
+logging:
+  level:
+    com:
+      lys: debug

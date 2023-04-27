@@ -1,0 +1,26 @@
+server:
+  port: 8001
+spring:
+  application:
+    name: named-context-factory-demo
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  cloud:
+    nacos:
+      config:
+        remote-first: true
+        bootstrap:
+          enable: true
+        server-addr: 127.0.0.1:8848
+        namespace: dev
+        file-extension: yaml
+        extension-configs[0]:
+          data-id: first-nacos-config-example.yaml
+          group: DEFAULT_GROUP
+          refresh: true
+
+logging:
+  level:
+    com:
+      lys: debug
